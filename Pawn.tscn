@@ -9,7 +9,7 @@ albedo_color = Color(1, 0.4, 0, 1)
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_6ovxa"]
 
-[node name="Pawn" type="CharacterBody3D"]
+[node name="Pawn" type="CharacterBody3D" groups=["Selectable"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 script = ExtResource("1_pstsj")
 

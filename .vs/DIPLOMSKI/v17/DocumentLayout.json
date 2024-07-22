@@ -7,16 +7,20 @@
       "RelativeMoniker": "D:0:0:{DDC20EDA-1A01-4AAF-B33A-3CF369042DB5}|Diplomski.csproj|solutionrelative:view.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{DDC20EDA-1A01-4AAF-B33A-3CF369042DB5}|Diplomski.csproj|c:\\users\\dorian\\documents\\projects\\pcduino\\diplomski\\selectiondummy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DDC20EDA-1A01-4AAF-B33A-3CF369042DB5}|Diplomski.csproj|solutionrelative:selectiondummy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DDC20EDA-1A01-4AAF-B33A-3CF369042DB5}|Diplomski.csproj|c:\\users\\dorian\\documents\\projects\\pcduino\\diplomski\\level.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DDC20EDA-1A01-4AAF-B33A-3CF369042DB5}|Diplomski.csproj|solutionrelative:level.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{DDC20EDA-1A01-4AAF-B33A-3CF369042DB5}|Diplomski.csproj|c:\\users\\dorian\\documents\\projects\\pcduino\\diplomski\\pawn.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{DDC20EDA-1A01-4AAF-B33A-3CF369042DB5}|Diplomski.csproj|solutionrelative:pawn.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{DDC20EDA-1A01-4AAF-B33A-3CF369042DB5}|Diplomski.csproj|c:\\users\\dorian\\documents\\projects\\pcduino\\diplomski\\floor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{DDC20EDA-1A01-4AAF-B33A-3CF369042DB5}|Diplomski.csproj|solutionrelative:floor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{DDC20EDA-1A01-4AAF-B33A-3CF369042DB5}|Diplomski.csproj|c:\\users\\dorian\\documents\\projects\\pcduino\\diplomski\\level.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{DDC20EDA-1A01-4AAF-B33A-3CF369042DB5}|Diplomski.csproj|solutionrelative:level.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -26,8 +30,21 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "SelectionDummy.cs",
+              "DocumentMoniker": "C:\\Users\\Dorian\\Documents\\Projects\\PcDuino\\Diplomski\\SelectionDummy.cs",
+              "RelativeDocumentMoniker": "SelectionDummy.cs",
+              "ToolTip": "C:\\Users\\Dorian\\Documents\\Projects\\PcDuino\\Diplomski\\SelectionDummy.cs",
+              "RelativeToolTip": "SelectionDummy.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAADsAAAAuAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-07-17T16:16:52.943Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
@@ -36,39 +53,39 @@
               "RelativeDocumentMoniker": "View.cs",
               "ToolTip": "C:\\Users\\Dorian\\Documents\\Projects\\PcDuino\\Diplomski\\View.cs",
               "RelativeToolTip": "View.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "ViewState": "AQIAABgAAAAAAAAAAAAowHUAAAAnAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-07-15T18:23:24.397Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 2,
               "Title": "level.cs",
               "DocumentMoniker": "C:\\Users\\Dorian\\Documents\\Projects\\PcDuino\\Diplomski\\level.cs",
               "RelativeDocumentMoniker": "level.cs",
               "ToolTip": "C:\\Users\\Dorian\\Documents\\Projects\\PcDuino\\Diplomski\\level.cs",
               "RelativeToolTip": "level.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAsAAAAZAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-15T17:56:53.649Z"
+              "WhenOpened": "2024-07-15T17:56:53.649Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 3,
               "Title": "Pawn.cs",
               "DocumentMoniker": "C:\\Users\\Dorian\\Documents\\Projects\\PcDuino\\Diplomski\\Pawn.cs",
               "RelativeDocumentMoniker": "Pawn.cs",
               "ToolTip": "C:\\Users\\Dorian\\Documents\\Projects\\PcDuino\\Diplomski\\Pawn.cs",
               "RelativeToolTip": "Pawn.cs",
-              "ViewState": "AQIAAAsAAAAAAAAAAAAgwCUAAAAkAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAsAAAAgAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-07-15T17:52:18.52Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-07-15T17:52:18.52Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 4,
               "Title": "Floor.cs",
               "DocumentMoniker": "C:\\Users\\Dorian\\Documents\\Projects\\PcDuino\\Diplomski\\Floor.cs",
               "RelativeDocumentMoniker": "Floor.cs",

@@ -9,6 +9,7 @@ public partial class Pawn : CharacterBody3D
 
     [Export]
     public float Speed { get; set; } = 25;
+    public bool Selected { get; set; }
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
@@ -21,6 +22,18 @@ public partial class Pawn : CharacterBody3D
     {
         this.Velocity = Velocity.MoveToward(safeVelocity, 0.05f);
         this.MoveAndSlide();
+    }
+
+    public void Select()
+    {
+        GD.Print("Selected");
+        Selected = true;
+    }
+
+    public void Unselect()
+    {
+        GD.Print("Unselected");
+        Selected = false;
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.

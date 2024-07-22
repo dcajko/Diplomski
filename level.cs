@@ -5,13 +5,6 @@ public partial class level : Node3D
 {
     private Pawn pawn;
 
-    public override void _Ready()
-    {
-        pawn = GetNode<Pawn>("Pawn");
-        var view = GetNode<View>("View");
-        view.Pawn = pawn;
-    }
-
     private void Level_MouseClick(Vector3 location)
     {
         pawn.SetGoToLocation(location);
