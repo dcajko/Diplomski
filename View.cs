@@ -1,7 +1,9 @@
+using Diplomski;
 using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 public partial class View : FreeLookCameraBase
 {
@@ -66,20 +68,32 @@ public partial class View : FreeLookCameraBase
                     {
                         EmitSignal(SignalName.SelectionClick);
                         var targetLocation = ShootRay();
-                        SelectedToLocation(targetLocation);
+                        var formationBox = new FormationBox();
+                        formationBox.MinSize = 2;
+                        formationBox.Position = targetLocation;
+                        int selectedPawnsCount = pawns.Where(x => x.Selected).Count();
+                        formationBox.Prepare(selectedPawnsCount);
+                        var points = formationBox.PreparePoints();
+                        Helper.AddNode(GetTree().Root, formationBox, "FormationBox");
+                        
+                        if(points.Count > 0)
+                        {
+                            SelectedToLocation(targetLocation, points);
+                        }
+                        lastLocation = targetLocation;
                     }
                 }
             }
         }
     }
-
-    private void SelectedToLocation(Vector3 loaction)
+    private void SelectedToLocation(Vector3 loaction, List<Vector3> points)
     {
+        int i = 0;
         foreach (var p in pawns)
         {
             if (p.Selected)
             {
-                p.SetGoToLocation(loaction);
+                p.SetGoToLocation(loaction + points[i++]);
             }
 
         }
