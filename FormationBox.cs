@@ -96,21 +96,27 @@ public partial class FormationBox : Node3D
                 CreatePoint((i + offset)*MinSize, y * MinSize);
             }
         }
-        return TargetPoints;
+        return GetPoints();
     }
 
     public List<Vector3> GetPoints()
     {
-
+        var nodes = this.GetChildren();
+        foreach (MeshInstance3D node in nodes)
+        {
+            TargetPoints.Add(node.GlobalPosition);
+        }
         return TargetPoints;
     }
 
     public void CreatePoint(float x, float y)
     {
         var newVector = new Vector3(x, 0, y);
-        TargetPoints.Add(newVector);
+        //TargetPoints.Add(newVector);
         //GD.Print($"Node Added: {x}, {y}");
-        var newNode = new Marker3D();
+        //var newNode = new Marker3D();
+        var newNode = new MeshInstance3D();
+        newNode.Mesh = new SphereMesh();
         this.AddChild(newNode);
         newNode.Owner = this;
         newNode.Position = newVector;

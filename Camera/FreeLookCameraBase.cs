@@ -51,7 +51,7 @@ public partial class FreeLookCameraBase : Camera3D
             {
                 case MouseButton.Right: // Only allows rotation if right click down
                 {
-                    Input.MouseMode = mouseButtonEvent.Pressed ? Input.MouseModeEnum.Captured : Input.MouseModeEnum.Visible;
+                    //Input.MouseMode = mouseButtonEvent.Pressed ? Input.MouseModeEnum.Captured : Input.MouseModeEnum.Visible;
                 }
                 break;
 

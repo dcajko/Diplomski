@@ -8,28 +8,68 @@ using System.Runtime.CompilerServices;
 public partial class View : FreeLookCameraBase
 {
     private bool buttonHeld = false;
+    private bool isDragging = false;
     private Vector3 firstLocation;
     private Vector3 lastLocation;
     private bool isShiftHeld;
     private float distanceMoved;
     private MouseEvents mouseEvents = MouseEvents.None;
     private InputEventMouseButton lastMouseInputEvent;
+    private FormationBox formationBox;
+
+    private float newDirection;
+
+    private MeshInstance3D firstLocationPointMarker;
+    private MeshInstance3D lastLocationPointMarker;
 
     [Signal]
-    public delegate void SelectionClickEventHandler(Vector3 location);
+    public delegate void MouseLeftDownEventHandler(Vector3 location);
+
     [Signal]
-    public delegate void SelectionStartedEventHandler(Vector3 location);
+    public delegate void MouseLeftUpEventHandler(Vector3 location);
+
     [Signal]
-    public delegate void SelectionResizeEventHandler(Vector3 location);
+    public delegate void MouseDragStartEventHandler(Vector3 location);
+
     [Signal]
-    public delegate void SelectionEndedEventHandler(Vector3 location);
+    public delegate void MouseDragEndEventHandler(Vector3 location);
+
     [Signal]
-    public delegate void MouseEventEventHandler(Vector3 location, MouseEvents mouseEvents);
+    public delegate void MouseDragResizeEventHandler(Vector3 location);
+
+    [Signal]
+    public delegate void MouseRightDownEventHandler(Vector3 location);
+
+    [Signal]
+    public delegate void MouseRightUpEventHandler(Vector3 location);
+
     public List<Pawn> pawns { get; private set; }
+
+    private void setFirstPoint(Vector3 location)
+    {
+        firstLocationPointMarker.GlobalPosition = location;
+        newDirection = firstLocation.AngleTo(location);
+        firstLocation = location;
+    }
+
+    private void setLastPoint(Vector3 location)
+    {
+        lastLocationPointMarker.GlobalPosition = location;
+        lastLocation = location;
+    }
 
     public override void _Ready()
     {
         pawns = GetTree().GetNodesInGroup("Selectable").Cast<Pawn>().ToList();
+        MouseRightUp += GoTo;
+        firstLocationPointMarker = new MeshInstance3D();
+        firstLocationPointMarker.Mesh = new CylinderMesh();
+
+        lastLocationPointMarker = new MeshInstance3D();
+        lastLocationPointMarker.Mesh = new BoxMesh();
+
+        Helper.AddNode(this, firstLocationPointMarker, "FirstMarker");
+        Helper.AddNode(this, lastLocationPointMarker, "LastMarker");
         //this.GetViewport().DebugDraw = Viewport.DebugDrawEnum.Overdraw;
     }
 
@@ -39,62 +79,19 @@ public partial class View : FreeLookCameraBase
         // TODO: Optimize; don't fire each tick
         if (buttonHeld)
         {
-            lastLocation = ShootRay().Item1;
+            setLastPoint(ShootRay().Item1);
             if (firstLocation.DistanceSquaredTo(lastLocation) > 1)
             {
-                EmitSignal(SignalName.SelectionResize, lastLocation);
+                if (!isDragging)
+                {
+                    isDragging = true;
+                    EmitSignal(SignalName.MouseDragStart, lastLocation);
+                }
+
+                EmitSignal(SignalName.MouseDragResize, lastLocation);
             }
         }
     }
-
-    public override void _Input(InputEvent @event)
-    {
-        base._Input(@event);
-        ProcessMouseInput(@event);
-
-        //if (@event is InputEventMouseButton mouseEvent)
-        //{
-        //    if (mouseEvent.ButtonIndex == MouseButton.Left)
-        //    {
-        //        if (mouseEvent.Pressed)
-        //        {
-        //            if (isShiftHeld)
-        //            {
-        //                casting = true;
-        //                firstLocation = ShootRay().Item1;
-        //                EmitSignal(SignalName.SelectionStarted, firstLocation);
-        //            }
-        //        }
-        //        else // Mouse button is released
-        //        {
-        //            if (casting)
-        //            {
-        //                casting = false;
-        //                EmitSignal(SignalName.SelectionEnded, lastLocation);
-        //            }
-        //            else
-        //            {
-        //                EmitSignal(SignalName.SelectionClick);
-        //                var targetLocation = ShootRay();
-        //                var formationBox = new FormationBox();
-        //                formationBox.MinSize = 2;
-        //                formationBox.Position = targetLocation.Item1;
-        //                int selectedPawnsCount = pawns.Where(x => x.Selected).Count();
-        //                formationBox.Prepare(selectedPawnsCount);
-        //                var points = formationBox.PreparePoints();
-        //                Helper.AddNode(GetTree().Root, formationBox, "FormationBox");
-
-        //                if (points.Count > 0)
-        //                {
-        //                    SelectedToLocation(targetLocation.Item1, points);
-        //                }
-        //                lastLocation = targetLocation.Item1;
-        //            }
-        //        }
-        //    }
-        //}
-    }
-
     private void ProcessMouseInput(InputEvent @event)
     {
         if (@event is InputEventKey keyEvent)
@@ -116,52 +113,87 @@ public partial class View : FreeLookCameraBase
 
             if (mouseEvents == MouseEvents.None)
             {
-                lastLocation = clickWorldLocation.Item1;
-                firstLocation = clickWorldLocation.Item1;
-                EmitSignal(SignalName.SelectionStarted, firstLocation);
+                setFirstPoint(clickWorldLocation.Item1);
+                setLastPoint(clickWorldLocation.Item1);
             }
 
-            if (clickWorldLocation.Item1.DistanceSquaredTo(lastLocation) > 1)
+            if (e.ButtonIndex == MouseButton.Left)
             {
-                if (e.ButtonIndex == MouseButton.Left)
+                if (e.Pressed)
                 {
-                    //GD.Print(e.Pressed ? "Left pressed" : "Left released");
-                    mouseEvents = e.Pressed
-                        ? mouseEvents | MouseEvents.LeftDragStart
-                        : mouseEvents ^ MouseEvents.LeftDragStart;
+                    EmitSignal(SignalName.MouseLeftDown, firstLocation);
                 }
-                else if (e.ButtonIndex == MouseButton.Right)
+                else
                 {
-                    //GD.Print(e.Pressed ? "Right pressed" : "Right released");
-                    mouseEvents = e.Pressed
-                        ? mouseEvents | MouseEvents.RightDragStart
-                        : mouseEvents ^ MouseEvents.RightDragStart;
+                    if (isDragging)
+                    {
+                        if (clickWorldLocation.Item2 != null)
+                        {
+                            clickWorldLocation.Item2.Select();
+                        }
+
+                        isDragging = false;
+                        EmitSignal(SignalName.MouseDragEnd, clickWorldLocation.Item1);
+                    } 
+                    else
+                    {
+                        EmitSignal(SignalName.MouseLeftUp, clickWorldLocation.Item1);
+                    }
+                    //EmitSignal(SignalName.SelectionEnded, lastLocation);
                 }
             }
-            else
+            else if (e.ButtonIndex == MouseButton.Right)
             {
-                if (e.ButtonIndex == MouseButton.Left)
+                if (e.Pressed)
                 {
-                    //GD.Print(e.Pressed ? "Left pressed" : "Left released");
-                    mouseEvents = e.Pressed
-                        ? mouseEvents | MouseEvents.LeftDown
-                        : mouseEvents ^ MouseEvents.LeftDown;
+                    EmitSignal(SignalName.MouseRightDown, clickWorldLocation.Item1);
                 }
-                else if (e.ButtonIndex == MouseButton.Right)
+                else
                 {
-                    //GD.Print(e.Pressed ? "Right pressed" : "Right released");
-                    mouseEvents = e.Pressed
-                        ? mouseEvents | MouseEvents.RightDown
-                        : mouseEvents ^ MouseEvents.RightDown;
+                    if (isDragging)
+                    {
+                        isDragging = false;
+                        EmitSignal(SignalName.MouseDragEnd, clickWorldLocation.Item1);
+                    }
+                    else
+                    {
+                        EmitSignal(SignalName.MouseRightUp, clickWorldLocation.Item1);
+                    }
                 }
             }
-            if (mouseEvents == MouseEvents.None)
-            {
-                EmitSignal(SignalName.SelectionEnded, lastLocation);
-            }
-            GD.Print(mouseEvents);
-            lastLocation = clickWorldLocation.Item1;
+
+            setLastPoint(clickWorldLocation.Item1);
         }
+    }
+    
+    public void GoTo(Vector3 targetLocation)
+    {
+        if (formationBox != null)
+        {
+            var directionTo = targetLocation.DirectionTo(formationBox.GlobalPosition);
+            newDirection = (float)Math.Atan2(directionTo.X, directionTo.Z);
+            formationBox.QueueFree();
+        }
+        formationBox = new FormationBox();
+        formationBox.MinSize = 2.1f;
+        formationBox.GlobalPosition = targetLocation;
+        formationBox.Rotation = new Vector3(0,newDirection,0);
+        int selectedPawnsCount = pawns.Where(x => x.Selected).Count();
+        formationBox.Prepare(selectedPawnsCount);
+        Helper.AddNode(GetTree().Root, formationBox, "FormationBox");
+
+        var points = formationBox.PreparePoints();
+        if (points.Count > 0)
+        {
+            SelectedToLocation(targetLocation, points);
+        }
+        setLastPoint(targetLocation);
+    }
+
+    public override void _Input(InputEvent @event)
+    {
+        base._Input(@event);
+        ProcessMouseInput(@event);
     }
 
     private void SelectedToLocation(Vector3 loaction, List<Vector3> points)
@@ -171,7 +203,7 @@ public partial class View : FreeLookCameraBase
         {
             if (p.Selected)
             {
-                p.SetGoToLocation(loaction + points[i++]);
+                p.SetGoToLocation(points[i++]);
             }
 
         }
