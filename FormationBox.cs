@@ -8,7 +8,6 @@ public partial class FormationBox : Node3D
     private int x, y, r;
     private Node3D pointContainer;
 
-    [Export]
     public Vector2 Size { get; set; } = new Vector2(10, 10);
     [Export]
     public float MinSize { get; set; } = 1f;
@@ -32,7 +31,7 @@ public partial class FormationBox : Node3D
             y -= 1;
             r = x + r;
         }
-        Size = new Vector2(x * MinSize, y * MinSize);
+        Size = new Vector2((x-1) * MinSize, (y-1) * MinSize);
         GD.Print($"{Num}: {sqrt}, {x}, {y}, {r}, {Size}");
     }
 
@@ -88,9 +87,9 @@ public partial class FormationBox : Node3D
         }
         if (r != 0)
         {
-            GD.Print($"Offset vars: x:{x}, r:{r}, minSize:{MinSize}");
+            //GD.Print($"Offset vars: x:{x}, r:{r}, minSize:{MinSize}");
             float offset = ((x-1) - (r - 1f))/2f;
-            GD.Print($"offset: {offset}");   
+            //GD.Print($"offset: {offset}");   
             for (int i = 0; i< r; i++)
             {
                 CreatePoint((i + offset)*MinSize, y * MinSize);
@@ -111,7 +110,7 @@ public partial class FormationBox : Node3D
 
     public void CreatePoint(float x, float y)
     {
-        var newVector = new Vector3(x, 0, y);
+        var newVector = new Vector3(x, 0, y) - new Vector3(Size.X, 0, Size.Y)*0.5f;
         //TargetPoints.Add(newVector);
         //GD.Print($"Node Added: {x}, {y}");
         //var newNode = new Marker3D();

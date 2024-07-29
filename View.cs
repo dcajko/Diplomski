@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
-public partial class View : FreeLookCameraBase
+public partial class View : Camera3D
 {
     private bool buttonHeld = false;
     private bool isDragging = false;
@@ -109,7 +109,6 @@ public partial class View : FreeLookCameraBase
         {
             lastMouseInputEvent = e;
             var clickWorldLocation = ShootRay();
-            buttonHeld = e.Pressed;
 
             if (mouseEvents == MouseEvents.None)
             {
@@ -119,6 +118,7 @@ public partial class View : FreeLookCameraBase
 
             if (e.ButtonIndex == MouseButton.Left)
             {
+                buttonHeld = e.Pressed;
                 if (e.Pressed)
                 {
                     EmitSignal(SignalName.MouseLeftDown, firstLocation);
@@ -176,7 +176,7 @@ public partial class View : FreeLookCameraBase
         }
         formationBox = new FormationBox();
         formationBox.MinSize = 2.1f;
-        formationBox.GlobalPosition = targetLocation;
+        formationBox.Position = targetLocation;
         formationBox.Rotation = new Vector3(0,newDirection,0);
         int selectedPawnsCount = pawns.Where(x => x.Selected).Count();
         formationBox.Prepare(selectedPawnsCount);
@@ -235,6 +235,7 @@ public partial class View : FreeLookCameraBase
                 }
             }
         }
+        rayQuery.Dispose();
         return (Vector3.Zero, null);
     }
 }

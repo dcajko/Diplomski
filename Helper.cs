@@ -16,5 +16,11 @@ namespace Diplomski
             child.Owner = parent;
             return true;
         }
+        public static bool AddNode(Node parent, Node child)
+        {
+            parent.AddChild(child);
+            child.Owner = parent;
+            return true;
+        }
     }
 }
