@@ -1,0 +1,32 @@
+[gd_scene load_steps=6 format=3 uid="uid://537pe4ucyavy"]
+
+[ext_resource type="Script" path="res://View.cs" id="1_hu5de"]
+[ext_resource type="Script" path="res://CameraRoot.cs" id="1_qyw8m"]
+[ext_resource type="Script" path="res://SelectionDummy.cs" id="2_cgscj"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gd35q"]
+albedo_color = Color(1, 0.501961, 1, 0.501961)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_kt553"]
+material = SubResource("StandardMaterial3D_gd35q")
+size = Vector2(1, 1)
+
+[node name="Game" type="Node3D"]
+
+[node name="CameraRoot" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.707107, -0.707107, 0, 0.707107, 0.707107, 0, 0, 0)
+script = ExtResource("1_qyw8m")
+MoveSpeed = 0.5
+
+[node name="Camera" type="Camera3D" parent="CameraRoot"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 5, 0)
+script = ExtResource("1_hu5de")
+
+[node name="SelectionDummy" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_kt553")
+skeleton = NodePath("../..")
+script = ExtResource("2_cgscj")
+
+[connection signal="MouseDragEnd" from="CameraRoot/Camera" to="SelectionDummy" method="OnSelectionEnd"]
+[connection signal="MouseDragResize" from="CameraRoot/Camera" to="SelectionDummy" method="OnSelectionChange"]
+[connection signal="MouseDragStart" from="CameraRoot/Camera" to="SelectionDummy" method="OnSelectionStart"]
