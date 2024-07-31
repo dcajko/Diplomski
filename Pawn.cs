@@ -6,10 +6,35 @@ public partial class Pawn : CharacterBody3D
     private NavigationAgent3D agent;
     private Vector3 ClickPosition;
     private Vector3 TarketPosition;
+    private bool selected;
+
+    [Export]
+    public Node3D SelectionNode { get; set; }
 
     [Export]
     public float Speed { get; set; } = 25;
-    public bool Selected { get; set; }
+    public bool Selected
+    {
+        get => selected; set
+        {
+            if (selected != value) 
+            { 
+                Select(value); 
+            }
+            selected = value;
+
+        }
+    }
+
+    private void Select(bool selected)
+    {
+        if (SelectionNode != null)
+        {
+            SelectionNode.Visible = selected;
+        }
+
+        GD.Print(selected ? "Selected" : "Unselected");
+    }
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
@@ -22,12 +47,6 @@ public partial class Pawn : CharacterBody3D
     {
         this.Velocity = Velocity.MoveToward(safeVelocity, 0.05f);
         this.MoveAndSlide();
-    }
-
-    public void Select()
-    {
-        GD.Print("Selected");
-        Selected = true;
     }
 
     public void Unselect()

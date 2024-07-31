@@ -11,6 +11,10 @@ public partial class View : Camera3D
     private bool isDragging = false;
     private Vector3 firstLocation;
     private Vector3 lastLocation;
+
+    private Vector3 rotationLocationA;
+    private Vector3 rotationLocationB;
+
     private bool isShiftHeld;
     private float distanceMoved;
     private MouseEvents mouseEvents = MouseEvents.None;
@@ -36,6 +40,12 @@ public partial class View : Camera3D
 
     [Signal]
     public delegate void MouseDragResizeEventHandler(Vector3 location);
+    
+    [Signal]
+    public delegate void MouseAltDragStartEventHandler(Vector3 location);
+
+    [Signal]
+    public delegate void MouseAltDragEndEventHandler(Vector3 locationA, Vector3 locationB);
 
     [Signal]
     public delegate void MouseRightDownEventHandler(Vector3 location);
@@ -48,7 +58,7 @@ public partial class View : Camera3D
     private void setFirstPoint(Vector3 location)
     {
         firstLocationPointMarker.GlobalPosition = location;
-        newDirection = firstLocation.AngleTo(location);
+        //newDirection = firstLocation.AngleTo(location);
         firstLocation = location;
     }
 
@@ -61,7 +71,10 @@ public partial class View : Camera3D
     public override void _Ready()
     {
         pawns = GetTree().GetNodesInGroup("Selectable").Cast<Pawn>().ToList();
+
         MouseRightUp += GoTo;
+        MouseAltDragEnd += GoToRotation;
+
         firstLocationPointMarker = new MeshInstance3D();
         firstLocationPointMarker.Mesh = new CylinderMesh();
 
@@ -85,10 +98,21 @@ public partial class View : Camera3D
                 if (!isDragging)
                 {
                     isDragging = true;
-                    EmitSignal(SignalName.MouseDragStart, lastLocation);
+                    if (!Input.IsMouseButtonPressed(MouseButton.Right))
+                    {
+                        EmitSignal(SignalName.MouseDragStart, lastLocation);
+                    }
+                    else
+                    {
+                        EmitSignal(SignalName.MouseAltDragStart, lastLocation);
+                        rotationLocationA = lastLocation;
+                    }
                 }
-
-                EmitSignal(SignalName.MouseDragResize, lastLocation);
+                if (!Input.IsMouseButtonPressed(MouseButton.Right))
+                {
+                    EmitSignal(SignalName.MouseDragResize, lastLocation);
+                }
+                
             }
         }
     }
@@ -109,6 +133,7 @@ public partial class View : Camera3D
         {
             lastMouseInputEvent = e;
             var clickWorldLocation = ShootRay();
+            buttonHeld = e.Pressed;
 
             if (mouseEvents == MouseEvents.None)
             {
@@ -118,7 +143,6 @@ public partial class View : Camera3D
 
             if (e.ButtonIndex == MouseButton.Left)
             {
-                buttonHeld = e.Pressed;
                 if (e.Pressed)
                 {
                     EmitSignal(SignalName.MouseLeftDown, firstLocation);
@@ -129,7 +153,7 @@ public partial class View : Camera3D
                     {
                         if (clickWorldLocation.Item2 != null)
                         {
-                            clickWorldLocation.Item2.Select();
+                            clickWorldLocation.Item2.Selected = true;
                         }
 
                         isDragging = false;
@@ -147,17 +171,25 @@ public partial class View : Camera3D
                 if (e.Pressed)
                 {
                     EmitSignal(SignalName.MouseRightDown, clickWorldLocation.Item1);
+                    rotationLocationA = clickWorldLocation.Item1;
                 }
                 else
                 {
                     if (isDragging)
                     {
                         isDragging = false;
-                        EmitSignal(SignalName.MouseDragEnd, clickWorldLocation.Item1);
+                        EmitSignal(SignalName.MouseAltDragEnd, rotationLocationA, clickWorldLocation.Item1);
+                        rotationLocationB = clickWorldLocation.Item1;
                     }
                     else
                     {
-                        EmitSignal(SignalName.MouseRightUp, clickWorldLocation.Item1);
+                        if (!isShiftHeld)
+                        {
+                            EmitSignal(SignalName.MouseRightUp, clickWorldLocation.Item1);
+                        } else
+                        {
+                            GD.Print($"{firstLocation}:{lastLocation}");
+                        }
                     }
                 }
             }
@@ -188,6 +220,30 @@ public partial class View : Camera3D
             SelectedToLocation(targetLocation, points);
         }
         setLastPoint(targetLocation);
+    }
+
+    public void GoToRotation(Vector3 locationA, Vector3 locationB)
+    {
+        if (formationBox != null)
+        {
+            var directionTo = locationB.DirectionTo(locationA);
+            newDirection = (float)Math.Atan2(directionTo.X, directionTo.Z);
+            formationBox.QueueFree();
+        }
+        formationBox = new FormationBox();
+        formationBox.MinSize = 2.1f;
+        formationBox.Position = locationA;
+        formationBox.Rotation = new Vector3(0, newDirection, 0);
+        int selectedPawnsCount = pawns.Where(x => x.Selected).Count();
+        formationBox.Prepare(selectedPawnsCount);
+        Helper.AddNode(GetTree().Root, formationBox, "FormationBox");
+
+        var points = formationBox.PreparePoints();
+        if (points.Count > 0)
+        {
+            SelectedToLocation(locationA, points);
+        }
+        setLastPoint(locationA);
     }
 
     public override void _Input(InputEvent @event)

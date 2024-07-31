@@ -32,7 +32,7 @@ public partial class FormationBox : Node3D
             r = x + r;
         }
         Size = new Vector2((x-1) * MinSize, (y-1) * MinSize);
-        GD.Print($"{Num}: {sqrt}, {x}, {y}, {r}, {Size}");
+        // GD.Print($"{Num}: {sqrt}, {x}, {y}, {r}, {Size}");
     }
 
     public override void _Ready()
@@ -87,9 +87,9 @@ public partial class FormationBox : Node3D
         }
         if (r != 0)
         {
-            //GD.Print($"Offset vars: x:{x}, r:{r}, minSize:{MinSize}");
+            //// GD.Print($"Offset vars: x:{x}, r:{r}, minSize:{MinSize}");
             float offset = ((x-1) - (r - 1f))/2f;
-            //GD.Print($"offset: {offset}");   
+            //// GD.Print($"offset: {offset}");   
             for (int i = 0; i< r; i++)
             {
                 CreatePoint((i + offset)*MinSize, y * MinSize);
@@ -112,7 +112,7 @@ public partial class FormationBox : Node3D
     {
         var newVector = new Vector3(x, 0, y) - new Vector3(Size.X, 0, Size.Y)*0.5f;
         //TargetPoints.Add(newVector);
-        //GD.Print($"Node Added: {x}, {y}");
+        //// GD.Print($"Node Added: {x}, {y}");
         //var newNode = new Marker3D();
         var newNode = new MeshInstance3D();
         newNode.Mesh = new SphereMesh();

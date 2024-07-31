@@ -16,25 +16,33 @@ public partial class SelectionDummy : MeshInstance3D
     public override void _Ready()
     {
         pawns = GetTree().GetNodesInGroup("Selectable").Cast<Pawn>().ToList();
+        this.Visible = false;
     }
 
     public void OnSelectionStart(Vector3 location)
     {
+        this.Visible = true;
         this.corner1 = location;
-    }
-    public void OnSelectionChange(Vector3 location)
-    {
-        corner2 = location;
-        Update();
-
         foreach (var pawn in pawns)
         {
             pawn.Selected = false;
         }
     }
+    public void OnSelectionChange(Vector3 location)
+    {
+        corner2 = location;
+        Update();
+        /*
+        foreach (var pawn in pawns)
+        {
+            pawn.Selected = false;
+        }
+        */
+    }
 
     public void OnSelectionEnd(Vector3 location)
     {
+        this.Visible = false;
         OnSelectionChange(location);
         this.Visible = false;
 
@@ -59,7 +67,7 @@ public partial class SelectionDummy : MeshInstance3D
         {
             if (aabb.HasPoint(p.GlobalPosition))
             {
-                p.Select();
+                p.Selected = true;
             }
         }
 
