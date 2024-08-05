@@ -40,12 +40,15 @@ public partial class CameraRoot : Marker3D
 
     private void Zoom()
     {
-        if (Input.IsActionJustPressed("CameraZoomIn")){
-            newCameraPosition -= new Vector3(0, 0.5f, 0);
+        if (Input.IsActionJustPressed("CameraZoomIn"))
+        {
+            camera.Size -= 2;
+            //newCameraPosition -= new Vector3(0, 10f, 0);
         }
         if (Input.IsActionJustPressed("CameraZoomOut"))
         {
-            newCameraPosition += new Vector3(0, 0.5f, 0);
+            camera.Size += 2;
+            //newCameraPosition += new Vector3(0, 10f, 0);
         }
 
         camera.Position = camera.Position.Lerp(newCameraPosition, 1);

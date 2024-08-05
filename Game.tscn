@@ -1,8 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://537pe4ucyavy"]
+[gd_scene load_steps=8 format=3 uid="uid://537pe4ucyavy"]
 
 [ext_resource type="Script" path="res://View.cs" id="1_hu5de"]
+[ext_resource type="Script" path="res://Game.cs" id="1_ilatl"]
 [ext_resource type="Script" path="res://CameraRoot.cs" id="1_qyw8m"]
 [ext_resource type="Script" path="res://SelectionDummy.cs" id="2_cgscj"]
+[ext_resource type="PackedScene" uid="uid://kxhf5c55dlrb" path="res://Interface.tscn" id="4_cfdp0"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gd35q"]
 albedo_color = Color(1, 0.501961, 1, 0.501961)
@@ -12,15 +14,22 @@ material = SubResource("StandardMaterial3D_gd35q")
 size = Vector2(1, 1)
 
 [node name="Game" type="Node3D"]
+script = ExtResource("1_ilatl")
 
 [node name="CameraRoot" type="Marker3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.707107, -0.707107, 0, 0.707107, 0.707107, 0, 0, 0)
 script = ExtResource("1_qyw8m")
 MoveSpeed = 0.5
 
-[node name="Camera" type="Camera3D" parent="CameraRoot"]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 10, 0)
+[node name="Camera" type="Camera3D" parent="CameraRoot" node_paths=PackedStringArray("Game")]
+transform = Transform3D(1, 0, 0, 0, 0.0174524, 0.999848, 0, -0.999848, 0.0174524, 0, 200, 0)
+projection = 1
+current = true
+size = 15.0
 script = ExtResource("1_hu5de")
+Game = NodePath("../..")
+
+[node name="Interface" parent="CameraRoot/Camera" instance=ExtResource("4_cfdp0")]
 
 [node name="SelectionDummy" type="MeshInstance3D" parent="."]
 mesh = SubResource("PlaneMesh_kt553")

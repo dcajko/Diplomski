@@ -11,11 +11,11 @@ public partial class SelectionDummy : MeshInstance3D
 
     private BoxShape3D selectShape = new BoxShape3D();
 
-    public List<Pawn> pawns { get; private set; }
+    public List<Pawn> pawns { get; set; }
 
     public override void _Ready()
     {
-        pawns = GetTree().GetNodesInGroup("Selectable").Cast<Pawn>().ToList();
+        //pawns = GetTree().GetNodesInGroup("Selectable").Cast<Pawn>().ToList();
         this.Visible = false;
     }
 

@@ -1,12 +1,14 @@
+using Diplomski;
 using Godot;
 using System;
 
 public partial class Pawn : CharacterBody3D
 {
     private NavigationAgent3D agent;
-    private Vector3 ClickPosition;
-    private Vector3 TarketPosition;
+    private Vector3 TargetPosition;
     private bool selected;
+
+
 
     [Export]
     public Node3D SelectionNode { get; set; }
@@ -25,6 +27,28 @@ public partial class Pawn : CharacterBody3D
 
         }
     }
+    [Export]
+    public VisibilityLevel visibility { get; set; } = VisibilityLevel.None;
+
+    [Export]
+    public int Player { get; set; } = 0;
+    [Export]
+    public Color PlayerColor { get; set; } = new Color(1, 1, 1, 1);
+
+    public override void _Ready()
+    {
+        agent = GetNode<NavigationAgent3D>("NavigationAgent3D");
+        //agent.VelocityComputed += Agent_VelocityComputed;
+        string GroupName = Player != 0 ? $"Player{Player}" : "Monster";
+        this.AddToGroup(GroupName);
+
+        var debugMesh = GetNode<MeshInstance3D>("DebugMesh");
+        var material = new StandardMaterial3D();
+        material.AlbedoColor = PlayerColor;
+        debugMesh.SetSurfaceOverrideMaterial(0, material);
+
+
+    }
 
     private void Select(bool selected)
     {
@@ -32,15 +56,7 @@ public partial class Pawn : CharacterBody3D
         {
             SelectionNode.Visible = selected;
         }
-
-        GD.Print(selected ? "Selected" : "Unselected");
-    }
-
-    // Called when the node enters the scene tree for the first time.
-    public override void _Ready()
-    {
-        agent = GetNode<NavigationAgent3D>("NavigationAgent3D");
-        agent.VelocityComputed += Agent_VelocityComputed;
+        //GD.Print(selected ? "Selected" : "Unselected");
     }
 
     private void Agent_VelocityComputed(Vector3 safeVelocity)

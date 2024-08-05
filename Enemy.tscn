@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://dmm8an8g7y6g6"]
+
+[ext_resource type="PackedScene" uid="uid://dakof5cxwlse7" path="res://Pawn.tscn" id="1_m1q45"]
+
+[node name="Enemy" type="Node3D"]
+
+[node name="Pawn" parent="." instance=ExtResource("1_m1q45")]
+PlayerColor = Color(1, 0, 0, 1)

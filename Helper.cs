@@ -22,5 +22,19 @@ namespace Diplomski
             child.Owner = parent;
             return true;
         }
+        public static uint SetCollision(uint collisionLayer, int layer)
+        {
+            uint layerBit = (uint)1 << (layer - 1);
+
+            return collisionLayer |= layerBit;
+        }
+
+        public static uint UnsetCollision(uint collisionLayer, int layer)
+        {
+            uint layerBit = (uint)1 << (layer - 1);
+
+            return collisionLayer &= ~layerBit;
+        }
     }
+
 }

@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 
 public partial class View : Camera3D
 {
+    private Game game;
     private bool buttonHeld = false;
     private bool isDragging = false;
     private Vector3 firstLocation;
@@ -20,6 +21,7 @@ public partial class View : Camera3D
     private MouseEvents mouseEvents = MouseEvents.None;
     private InputEventMouseButton lastMouseInputEvent;
     private FormationBox formationBox;
+    private SelectionDummy selectionDummy;
 
     private float newDirection;
 
@@ -40,7 +42,7 @@ public partial class View : Camera3D
 
     [Signal]
     public delegate void MouseDragResizeEventHandler(Vector3 location);
-    
+
     [Signal]
     public delegate void MouseAltDragStartEventHandler(Vector3 location);
 
@@ -54,6 +56,9 @@ public partial class View : Camera3D
     public delegate void MouseRightUpEventHandler(Vector3 location);
 
     public List<Pawn> pawns { get; private set; }
+
+    [Export]
+    public Game Game { get; set; }
 
     private void setFirstPoint(Vector3 location)
     {
@@ -70,7 +75,13 @@ public partial class View : Camera3D
 
     public override void _Ready()
     {
-        pawns = GetTree().GetNodesInGroup("Selectable").Cast<Pawn>().ToList();
+        if (this.Owner is Game g)
+        {
+            game = g;
+        }
+
+        selectionDummy = this.Owner.GetNode<SelectionDummy>("SelectionDummy");
+        SetupPlayerView(game.PlayerTurn);
 
         MouseRightUp += GoTo;
         MouseAltDragEnd += GoToRotation;
@@ -83,7 +94,14 @@ public partial class View : Camera3D
 
         Helper.AddNode(this, firstLocationPointMarker, "FirstMarker");
         Helper.AddNode(this, lastLocationPointMarker, "LastMarker");
+
         //this.GetViewport().DebugDraw = Viewport.DebugDrawEnum.Overdraw;
+    }
+
+    public void SetupPlayerView(int player)
+    {
+        pawns = GetTree().GetNodesInGroup("Selectable").Cast<Pawn>().Where(x => x.Player == 1).ToList();
+        selectionDummy.pawns = pawns;
     }
 
     public override void _Process(double delta)
@@ -112,7 +130,7 @@ public partial class View : Camera3D
                 {
                     EmitSignal(SignalName.MouseDragResize, lastLocation);
                 }
-                
+
             }
         }
     }
@@ -158,10 +176,17 @@ public partial class View : Camera3D
 
                         isDragging = false;
                         EmitSignal(SignalName.MouseDragEnd, clickWorldLocation.Item1);
-                    } 
+                    }
                     else
                     {
                         EmitSignal(SignalName.MouseLeftUp, clickWorldLocation.Item1);
+                        if (clickWorldLocation.Item2 != null && clickWorldLocation.Item2.Player == game.PlayerTurn && isShiftHeld)
+                        {
+                            clickWorldLocation.Item2.Selected = true;
+                        } else
+                        {
+                            DeselectPawns();
+                        }
                     }
                     //EmitSignal(SignalName.SelectionEnded, lastLocation);
                 }
@@ -186,7 +211,8 @@ public partial class View : Camera3D
                         if (!isShiftHeld)
                         {
                             EmitSignal(SignalName.MouseRightUp, clickWorldLocation.Item1);
-                        } else
+                        }
+                        else
                         {
                             GD.Print($"{firstLocation}:{lastLocation}");
                         }
@@ -197,7 +223,7 @@ public partial class View : Camera3D
             setLastPoint(clickWorldLocation.Item1);
         }
     }
-    
+
     public void GoTo(Vector3 targetLocation)
     {
         if (formationBox != null)
@@ -209,9 +235,8 @@ public partial class View : Camera3D
         formationBox = new FormationBox();
         formationBox.MinSize = 2.1f;
         formationBox.Position = targetLocation;
-        formationBox.Rotation = new Vector3(0,newDirection,0);
-        int selectedPawnsCount = pawns.Where(x => x.Selected).Count();
-        formationBox.Prepare(selectedPawnsCount);
+        formationBox.Rotation = new Vector3(0, newDirection, 0);
+        formationBox.Prepare(pawns);
         Helper.AddNode(GetTree().Root, formationBox, "FormationBox");
 
         var points = formationBox.PreparePoints();
@@ -234,8 +259,7 @@ public partial class View : Camera3D
         formationBox.MinSize = 2.1f;
         formationBox.Position = locationA;
         formationBox.Rotation = new Vector3(0, newDirection, 0);
-        int selectedPawnsCount = pawns.Where(x => x.Selected).Count();
-        formationBox.Prepare(selectedPawnsCount);
+        formationBox.Prepare(pawns);
         Helper.AddNode(GetTree().Root, formationBox, "FormationBox");
 
         var points = formationBox.PreparePoints();
@@ -265,16 +289,25 @@ public partial class View : Camera3D
         }
     }
 
+    private void DeselectPawns()
+    {
+        foreach (var p in pawns)
+        {
+            p.Selected = false;
+        }
+    }
+
     public (Vector3, Pawn) ShootRay()
     {
         var mousePosition = this.GetViewport().GetMousePosition();
-        int rayLength = 1000;
+        int rayLength = 10000;
         var from = ProjectRayOrigin(mousePosition);
         var to = from + ProjectRayNormal(mousePosition) * rayLength;
         var space = GetWorld3D().DirectSpaceState;
         var rayQuery = new PhysicsRayQueryParameters3D();
         rayQuery.From = from;
         rayQuery.To = to;
+        rayQuery.CollisionMask = Helper.SetCollision(rayQuery.CollisionMask, 2);
         var raycastResult = space.IntersectRay(rayQuery);
         if (raycastResult != null)
         {

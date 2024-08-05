@@ -1,14 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://dakof5cxwlse7"]
+[gd_scene load_steps=5 format=3 uid="uid://dakof5cxwlse7"]
 
 [ext_resource type="Script" path="res://Pawn.cs" id="1_pstsj"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_fpqhd"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_b1vud"]
-albedo_color = Color(1, 0.4, 0, 1)
-
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_6ovxa"]
-radius = 0.1
 
 [sub_resource type="SphereMesh" id="SphereMesh_0e4m4"]
 radius = 0.2
@@ -16,12 +12,14 @@ height = 0.4
 
 [node name="Pawn" type="CharacterBody3D" node_paths=PackedStringArray("SelectionNode") groups=["Selectable"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+collision_layer = 2
 script = ExtResource("1_pstsj")
 SelectionNode = NodePath("SelectionMarker")
+visibility = 1
+PlayerColor = Color(1, 0.501961, 0, 1)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="DebugMesh" type="MeshInstance3D" parent="."]
 mesh = SubResource("CapsuleMesh_fpqhd")
-surface_material_override/0 = SubResource("StandardMaterial3D_b1vud")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("CapsuleShape3D_6ovxa")

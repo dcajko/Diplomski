@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 [Tool]
 public partial class FormationBox : Node3D
@@ -19,6 +20,15 @@ public partial class FormationBox : Node3D
         get => false; set => _Ready();
     }
     public List<Vector3> TargetPoints { get; private set; } = new List<Vector3>();
+    public List<Pawn> Pawns { get; private set; }
+
+    public void Prepare(List<Pawn> pawns)
+    {
+        int selectedPawnsCount = pawns.Where(x => x.Selected).Count();
+        this.Pawns = pawns;
+        Prepare(selectedPawnsCount);
+        
+    }
 
     public void Prepare(int Num)
     {
@@ -33,13 +43,6 @@ public partial class FormationBox : Node3D
         }
         Size = new Vector2((x-1) * MinSize, (y-1) * MinSize);
         // GD.Print($"{Num}: {sqrt}, {x}, {y}, {r}, {Size}");
-    }
-
-    public override void _Ready()
-    {
-        //ClearChildren();
-        //Prepare(NumberOfSelected);
-        //PreparePoints();
     }
 
     private void ClearChildren()
