@@ -24,8 +24,8 @@ public partial class FormationBox : Node3D
 
     public void Prepare(List<Pawn> pawns)
     {
-        int selectedPawnsCount = pawns.Where(x => x.Selected).Count();
-        this.Pawns = pawns;
+        this.Pawns = pawns.Where(x => x.Selected).ToList();
+        int selectedPawnsCount = Pawns.Count;
         Prepare(selectedPawnsCount);
         
     }
@@ -122,5 +122,15 @@ public partial class FormationBox : Node3D
         this.AddChild(newNode);
         newNode.Owner = this;
         newNode.Position = newVector;
+    }
+
+    public void MoveUnits()
+    {
+        int i = 0;
+        var points = this.GetPoints();
+        foreach (var p in this.Pawns)
+        {
+            p.SetGoToLocation(points[i++]);
+        }
     }
 }

@@ -29,7 +29,8 @@ size = 15.0
 script = ExtResource("1_hu5de")
 Game = NodePath("../..")
 
-[node name="Interface" parent="CameraRoot/Camera" instance=ExtResource("4_cfdp0")]
+[node name="Interface" parent="CameraRoot/Camera" node_paths=PackedStringArray("Game") instance=ExtResource("4_cfdp0")]
+Game = NodePath("../../..")
 
 [node name="SelectionDummy" type="MeshInstance3D" parent="."]
 mesh = SubResource("PlaneMesh_kt553")
@@ -39,3 +40,6 @@ script = ExtResource("2_cgscj")
 [connection signal="MouseDragEnd" from="CameraRoot/Camera" to="SelectionDummy" method="OnSelectionEnd"]
 [connection signal="MouseDragResize" from="CameraRoot/Camera" to="SelectionDummy" method="OnSelectionChange"]
 [connection signal="MouseDragStart" from="CameraRoot/Camera" to="SelectionDummy" method="OnSelectionStart"]
+[connection signal="button_up" from="CameraRoot/Camera/Interface/Button" to="." method="NextTurn"]
+
+[editable path="CameraRoot/Camera/Interface"]

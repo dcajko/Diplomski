@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Xml.Linq;
 
 public partial class View : Camera3D
 {
@@ -20,7 +21,7 @@ public partial class View : Camera3D
     private float distanceMoved;
     private MouseEvents mouseEvents = MouseEvents.None;
     private InputEventMouseButton lastMouseInputEvent;
-    private FormationBox formationBox;
+    //private FormationBox formationBox;
     private SelectionDummy selectionDummy;
 
     private float newDirection;
@@ -55,7 +56,7 @@ public partial class View : Camera3D
     [Signal]
     public delegate void MouseRightUpEventHandler(Vector3 location);
 
-    public List<Pawn> pawns { get; private set; }
+    public List<Pawn> SelectablePawns { get; private set; }
 
     [Export]
     public Game Game { get; set; }
@@ -81,10 +82,10 @@ public partial class View : Camera3D
         }
 
         selectionDummy = this.Owner.GetNode<SelectionDummy>("SelectionDummy");
-        SetupPlayerView(game.PlayerTurn);
+        //SetupPlayerView(game.PlayerTurn);
 
-        MouseRightUp += GoTo;
-        MouseAltDragEnd += GoToRotation;
+        MouseRightUp += NewOrder;
+        MouseAltDragEnd += NewOrder;
 
         firstLocationPointMarker = new MeshInstance3D();
         firstLocationPointMarker.Mesh = new CylinderMesh();
@@ -100,8 +101,8 @@ public partial class View : Camera3D
 
     public void SetupPlayerView(int player)
     {
-        pawns = GetTree().GetNodesInGroup("Selectable").Cast<Pawn>().Where(x => x.Player == 1).ToList();
-        selectionDummy.pawns = pawns;
+        SelectablePawns = GetTree().GetNodesInGroup("Selectable").Cast<Pawn>().Where(x => x.Player == 1).ToList();
+        selectionDummy.pawns = SelectablePawns;
     }
 
     public override void _Process(double delta)
@@ -223,49 +224,45 @@ public partial class View : Camera3D
             setLastPoint(clickWorldLocation.Item1);
         }
     }
-
-    public void GoTo(Vector3 targetLocation)
+    /// <summary>
+    /// Uses average position of selected pawns and moveToLocation as the look at direction
+    /// </summary>
+    /// <param name="moveToLocation"></param>
+    public void NewOrder(Vector3 moveToLocation)
     {
-        if (formationBox != null)
-        {
-            var directionTo = targetLocation.DirectionTo(formationBox.GlobalPosition);
-            newDirection = (float)Math.Atan2(directionTo.X, directionTo.Z);
-            formationBox.QueueFree();
-        }
-        formationBox = new FormationBox();
-        formationBox.MinSize = 2.1f;
-        formationBox.Position = targetLocation;
-        formationBox.Rotation = new Vector3(0, newDirection, 0);
-        formationBox.Prepare(pawns);
-        Helper.AddNode(GetTree().Root, formationBox, "FormationBox");
-
-        var points = formationBox.PreparePoints();
-        if (points.Count > 0)
-        {
-            SelectedToLocation(targetLocation, points);
-        }
-        setLastPoint(targetLocation);
+        var SelectedPawns = SelectablePawns.Where(x => x.Selected);
+        Vector3 AverageSelectionLocation = SelectedPawns.Aggregate(Vector3.Zero, (acc, obj) => acc + obj.GlobalPosition);
+        var count = SelectedPawns.Count();
+        var directionTo = moveToLocation.DirectionTo(AverageSelectionLocation/count);
+        var newOrientation = (float)Math.Atan2(directionTo.X, directionTo.Z);
+        CreateNewOrder(moveToLocation, newOrientation);
     }
 
-    public void GoToRotation(Vector3 locationA, Vector3 locationB)
+    /// <summary>
+    /// New order with player provided look at direction
+    /// </summary>
+    /// <param name="moveToLocation"></param>
+    /// <param name="LookAtLocation"></param>
+    public void NewOrder(Vector3 moveToLocation, Vector3 LookAtLocation)
     {
-        if (formationBox != null)
-        {
-            var directionTo = locationB.DirectionTo(locationA);
-            newDirection = (float)Math.Atan2(directionTo.X, directionTo.Z);
-            formationBox.QueueFree();
-        }
-        formationBox = new FormationBox();
+        var directionTo = LookAtLocation.DirectionTo(moveToLocation);
+        var newOrientation = (float)Math.Atan2(directionTo.X, directionTo.Z);
+        CreateNewOrder(moveToLocation, newOrientation);
+    }
+
+    private void CreateNewOrder(Vector3 locationA, float Orientation)
+    {
+        var formationBox = new FormationBox();
         formationBox.MinSize = 2.1f;
         formationBox.Position = locationA;
-        formationBox.Rotation = new Vector3(0, newDirection, 0);
-        formationBox.Prepare(pawns);
-        Helper.AddNode(GetTree().Root, formationBox, "FormationBox");
+        formationBox.Rotation = new Vector3(0, Orientation, 0);
+        formationBox.Prepare(SelectablePawns);
+        Helper.AddNode(GetTree().Root, formationBox);
 
         var points = formationBox.PreparePoints();
         if (points.Count > 0)
         {
-            SelectedToLocation(locationA, points);
+            Game.Moves.Add(new Move(game.PlayerTurn, locationA, formationBox));
         }
         setLastPoint(locationA);
     }
@@ -279,7 +276,7 @@ public partial class View : Camera3D
     private void SelectedToLocation(Vector3 loaction, List<Vector3> points)
     {
         int i = 0;
-        foreach (var p in pawns)
+        foreach (var p in SelectablePawns)
         {
             if (p.Selected)
             {
@@ -291,7 +288,7 @@ public partial class View : Camera3D
 
     private void DeselectPawns()
     {
-        foreach (var p in pawns)
+        foreach (var p in SelectablePawns)
         {
             p.Selected = false;
         }
