@@ -101,7 +101,7 @@ public partial class View : Camera3D
 
     public void SetupPlayerView(int player)
     {
-        SelectablePawns = GetTree().GetNodesInGroup("Selectable").Cast<Pawn>().Where(x => x.Player == 1).ToList();
+        SelectablePawns = GetTree().GetNodesInGroup("Selectable").Cast<Pawn>().Where(x => x.Player == player).ToList();
         selectionDummy.pawns = SelectablePawns;
     }
 

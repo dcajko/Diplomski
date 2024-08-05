@@ -6,7 +6,7 @@ using System.Collections.Generic;
 public partial class Game : Node3D
 {
     [Export]
-    public int NumberOfPlayers { get; set; } = 1;
+    public int NumberOfPlayers { get; set; } = 2;
 
     public int PlayerTurn { get; set; } = 1;
 
