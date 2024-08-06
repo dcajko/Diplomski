@@ -40,6 +40,8 @@ script = ExtResource("2_cgscj")
 [connection signal="MouseDragEnd" from="CameraRoot/Camera" to="SelectionDummy" method="OnSelectionEnd"]
 [connection signal="MouseDragResize" from="CameraRoot/Camera" to="SelectionDummy" method="OnSelectionChange"]
 [connection signal="MouseDragStart" from="CameraRoot/Camera" to="SelectionDummy" method="OnSelectionStart"]
-[connection signal="button_up" from="CameraRoot/Camera/Interface/Button" to="." method="NextTurn"]
+[connection signal="button_up" from="CameraRoot/Camera/Interface/VBoxContainer/btnNextTurn" to="." method="NextTurn"]
+[connection signal="button_up" from="CameraRoot/Camera/Interface/VBoxContainer/btnDBGSpawnPlayer" to="." method="SpawnPlayerPawn"]
+[connection signal="button_up" from="CameraRoot/Camera/Interface/VBoxContainer/btnDBGSpawnEnemy" to="." method="SpawnEnemyPawn"]
 
 [editable path="CameraRoot/Camera/Interface"]

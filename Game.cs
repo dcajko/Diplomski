@@ -6,13 +6,23 @@ using System.Collections.Generic;
 public partial class Game : Node3D
 {
     [Export]
-    public int NumberOfPlayers { get; set; } = 2;
+    public int NumberOfPlayers { get; set; } = 1;
 
     public int PlayerTurn { get; set; } = 1;
-
+    public int PlayerGold { get; set; } = 0;
     public List<Move> Moves { get; set; } = new List<Move>();
 
     private View ViewNode { get; set; }
+
+    public void SpawnPlayerPawn()
+    {
+        GetTree().CallGroup("PlayerSpawner", "Spawn");
+    }
+
+    public void SpawnEnemyPawn()
+    {
+        GetTree().CallGroup("EnemySpawner", "Spawn");
+    }
 
     public override void _Ready()
     {
@@ -25,7 +35,7 @@ public partial class Game : Node3D
         PlayerTurn++;
         if (PlayerTurn > NumberOfPlayers)
         {
-            PlayerTurn = 1;
+            PlayerTurn = 0;
             PlayMoves();
         }
         SetupTurn();
