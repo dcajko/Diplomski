@@ -4,11 +4,20 @@ using System;
 
 public partial class Pawn : CharacterBody3D
 {
-    private NavigationAgent3D agent;
     private Vector3 TargetPosition;
     private bool selected;
+    private Area3D damageShape;
+    private Random random = new Random();
+    private Pawn DamageTarget;
+    private DamageIndicator damageIndicator;
 
+    [Signal]
+    public delegate void InCombatEventHandler();
+    [Signal]
+    public delegate void DeathEventHandler();
 
+    public NavigationAgent3D Agent { get; set; }
+    public Timer damageTimer { get; set; }
 
     [Export]
     public Node3D SelectionNode { get; set; }
@@ -19,9 +28,9 @@ public partial class Pawn : CharacterBody3D
     {
         get => selected; set
         {
-            if (selected != value) 
-            { 
-                Select(value); 
+            if (selected != value)
+            {
+                Select(value);
             }
             selected = value;
 
@@ -34,10 +43,17 @@ public partial class Pawn : CharacterBody3D
     public int Player { get; set; } = 0;
     [Export]
     public Color PlayerColor { get; set; } = new Color(1, 1, 1, 1);
+    public int Hp { get; private set; } = 100;
 
     public override void _Ready()
     {
-        agent = GetNode<NavigationAgent3D>("NavigationAgent3D");
+        damageIndicator = GetNode<DamageIndicator>("DamageIndicator");
+
+        Agent = GetNode<NavigationAgent3D>("NavigationAgent3D");
+        damageShape = GetNode<Area3D>("DamageBoxArea");
+        damageShape.BodyEntered += DamageShape_BodyEntered;
+
+        damageTimer = GetNode<Timer>("DamageTimer");
         //agent.VelocityComputed += Agent_VelocityComputed;
         string GroupName = Player != 0 ? $"Player{Player}" : "Monster";
         this.AddToGroup(GroupName);
@@ -46,8 +62,43 @@ public partial class Pawn : CharacterBody3D
         var material = new StandardMaterial3D();
         material.AlbedoColor = PlayerColor;
         debugMesh.SetSurfaceOverrideMaterial(0, material);
+    }
 
+    private void DamageShape_BodyEntered(Node3D body)
+    {
+        if (body == null) return;
+        if (body is Pawn pawn)
+        {
+            if (pawn.Player != Player)
+            {
+                EmitSignal(SignalName.InCombat);
+                this.DamageTarget = pawn;
+                this.damageTimer.Timeout += DealDamage;
+                this.damageTimer.Start(random.NextDouble());
+                this.Agent.TargetPosition = this.GlobalPosition;
+            }
+        }
+    }
 
+    private void DealDamage()
+    {
+        GD.Print("Damage!");
+        damageIndicator.ShowIndicator(0.2f);
+        DamageTarget.Death += TurnFinished;
+        DamageTarget.Hp -= 7 + random.Next(3);
+        if(DamageTarget.Hp <= 0)
+        {
+            DamageTarget.Die(this);
+        }
+    }
+
+    private void Die(Pawn pawn)
+    {
+        GD.Print("Pawn died");
+        EmitSignal(SignalName.Death);
+        TurnFinished();
+        this.Visible = false;
+        this.Player = -1;
     }
 
     private void Select(bool selected)
@@ -71,16 +122,11 @@ public partial class Pawn : CharacterBody3D
         Selected = false;
     }
 
-    // Called every frame. 'delta' is the elapsed time since the previous frame.
-    public override void _Process(double delta)
-    {
-    }
-
     public override void _PhysicsProcess(double delta)
     {
 
         var currentLocation = this.GlobalTransform.Origin;
-        var nextLocation = agent.GetNextPathPosition();
+        var nextLocation = Agent.GetNextPathPosition();
         var newVelocity = (nextLocation - currentLocation).Normalized() * Speed;
 
         this.Velocity = newVelocity;
@@ -89,6 +135,17 @@ public partial class Pawn : CharacterBody3D
 
     public void SetGoToLocation(Vector3 location)
     {
-        agent.TargetPosition = location;
+        Agent.TargetPosition = location;
+    }
+
+    public void TurnFinished()
+    {
+        this.Agent.TargetPosition = this.GlobalPosition;
+        this.damageTimer.Stop();
+        if (DamageTarget != null)
+        {
+            DamageTarget.Death -= TurnFinished;
+        }
+        this.DamageTarget = null;
     }
 }

@@ -25,7 +25,7 @@ MoveSpeed = 0.5
 transform = Transform3D(1, 0, 0, 0, 0.0174524, 0.999848, 0, -0.999848, 0.0174524, 0, 200, 0)
 projection = 1
 current = true
-size = 15.0
+size = 70.0
 script = ExtResource("1_hu5de")
 Game = NodePath("../..")
 
@@ -40,8 +40,8 @@ script = ExtResource("2_cgscj")
 [connection signal="MouseDragEnd" from="CameraRoot/Camera" to="SelectionDummy" method="OnSelectionEnd"]
 [connection signal="MouseDragResize" from="CameraRoot/Camera" to="SelectionDummy" method="OnSelectionChange"]
 [connection signal="MouseDragStart" from="CameraRoot/Camera" to="SelectionDummy" method="OnSelectionStart"]
-[connection signal="button_up" from="CameraRoot/Camera/Interface/VBoxContainer/btnNextTurn" to="." method="NextTurn"]
-[connection signal="button_up" from="CameraRoot/Camera/Interface/VBoxContainer/btnDBGSpawnPlayer" to="." method="SpawnPlayerPawn"]
-[connection signal="button_up" from="CameraRoot/Camera/Interface/VBoxContainer/btnDBGSpawnEnemy" to="." method="SpawnEnemyPawn"]
+[connection signal="button_up" from="CameraRoot/Camera/Interface/GameControls/btnNextTurn" to="." method="NextTurn"]
+[connection signal="button_up" from="CameraRoot/Camera/Interface/GameControls/btnDBGSpawnPlayer" to="." method="SpawnPlayerPawn"]
+[connection signal="button_up" from="CameraRoot/Camera/Interface/GameControls/btnDBGSpawnEnemy" to="." method="SpawnEnemyPawn"]
 
 [editable path="CameraRoot/Camera/Interface"]

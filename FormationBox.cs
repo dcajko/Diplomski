@@ -8,6 +8,10 @@ public partial class FormationBox : Node3D
 {
     private int x, y, r;
     private Node3D pointContainer;
+    private int numPawnsReachedTarget;
+
+    [Signal]
+    public delegate void AllPawnsAtLocationEventHandler();
 
     public Vector2 Size { get; set; } = new Vector2(10, 10);
     [Export]
@@ -25,9 +29,39 @@ public partial class FormationBox : Node3D
     public void Prepare(List<Pawn> pawns)
     {
         this.Pawns = pawns.Where(x => x.Selected).ToList();
-        int selectedPawnsCount = Pawns.Count;
-        Prepare(selectedPawnsCount);
-        
+        numPawnsReachedTarget = this.Pawns.Count;
+        foreach (var item in pawns)
+        {
+            item.Agent.NavigationFinished += ReachedTarget;
+            item.InCombat += FormationInCombat;
+        }
+        Prepare(numPawnsReachedTarget);
+    }
+
+    private void FormationInCombat()
+    {
+    }
+
+    public void StopUnits()
+    {
+        StopCombat();
+    }
+
+    public void StopCombat()
+    {
+        foreach (var pawn in Pawns)
+        {
+            pawn.TurnFinished();
+        }
+    }
+
+    private void ReachedTarget()
+    {
+        numPawnsReachedTarget--;
+        if (numPawnsReachedTarget <= 0)
+        {
+            EmitSignal(SignalName.AllPawnsAtLocation);
+        }
     }
 
     public void Prepare(int Num)
