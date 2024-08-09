@@ -51,7 +51,7 @@ public partial class FormationBox : Node3D
     {
         foreach (var pawn in Pawns)
         {
-            pawn.TurnFinished();
+            pawn.ExitCombat();
         }
     }
 

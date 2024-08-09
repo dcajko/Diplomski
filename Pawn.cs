@@ -1,6 +1,7 @@
 using Diplomski;
 using Godot;
 using System;
+using System.Runtime.CompilerServices;
 
 public partial class Pawn : CharacterBody3D
 {
@@ -51,7 +52,7 @@ public partial class Pawn : CharacterBody3D
 
         Agent = GetNode<NavigationAgent3D>("NavigationAgent3D");
         damageShape = GetNode<Area3D>("DamageBoxArea");
-        damageShape.BodyEntered += DamageShape_BodyEntered;
+        damageShape.BodyEntered += this.DamageShape_BodyEntered;
 
         damageTimer = GetNode<Timer>("DamageTimer");
         //agent.VelocityComputed += Agent_VelocityComputed;
@@ -71,34 +72,61 @@ public partial class Pawn : CharacterBody3D
         {
             if (pawn.Player != Player)
             {
-                EmitSignal(SignalName.InCombat);
-                this.DamageTarget = pawn;
-                this.damageTimer.Timeout += DealDamage;
-                this.damageTimer.Start(random.NextDouble());
-                this.Agent.TargetPosition = this.GlobalPosition;
+                this.EmitSignal(SignalName.InCombat);
+                this.EnterCombat(pawn);
             }
         }
     }
 
-    private void DealDamage()
+    public void EnterCombat(Pawn pawn)
+    {
+        StopMovement();
+
+        this.DamageTarget = pawn;
+        this.DamageTarget.Death += ExitCombat;
+
+        this.damageTimer.OneShot = false;
+        this.damageTimer.Timeout += DealDamage;
+        this.damageTimer.Start(random.NextDouble());
+    }
+
+    private void StopMovement()
+    {
+        this.Agent.TargetPosition = this.GlobalPosition;
+    }
+
+    public void DealDamage()
+    {
+        this.DamageTarget.GetDamaged(50);
+    }
+
+    public void ExitCombat()
+    {
+        this.damageTimer.Stop();
+        this.damageTimer.Timeout -= DealDamage;
+        this.DamageTarget = null;
+    }
+
+    private void GetDamaged(int damage)
     {
         GD.Print("Damage!");
+        this.Hp -= damage;
         damageIndicator.ShowIndicator(0.2f);
-        DamageTarget.Death += TurnFinished;
-        DamageTarget.Hp -= 7 + random.Next(3);
-        if(DamageTarget.Hp <= 0)
+        if (this.Hp <= 0)
         {
-            DamageTarget.Die(this);
+            this.Die();
         }
     }
 
-    private void Die(Pawn pawn)
+    private void Die()
     {
         GD.Print("Pawn died");
         EmitSignal(SignalName.Death);
         TurnFinished();
         this.Visible = false;
         this.Player = -1;
+        this.CollisionLayer = 0;
+        this.GlobalPosition = new Vector3(0, 1000, 0);
     }
 
     private void Select(bool selected)
@@ -119,12 +147,11 @@ public partial class Pawn : CharacterBody3D
     public void Unselect()
     {
         GD.Print("Unselected");
-        Selected = false;
+        this.Selected = false;
     }
 
     public override void _PhysicsProcess(double delta)
     {
-
         var currentLocation = this.GlobalTransform.Origin;
         var nextLocation = Agent.GetNextPathPosition();
         var newVelocity = (nextLocation - currentLocation).Normalized() * Speed;
@@ -140,12 +167,6 @@ public partial class Pawn : CharacterBody3D
 
     public void TurnFinished()
     {
-        this.Agent.TargetPosition = this.GlobalPosition;
-        this.damageTimer.Stop();
-        if (DamageTarget != null)
-        {
-            DamageTarget.Death -= TurnFinished;
-        }
-        this.DamageTarget = null;
+        StopMovement();
     }
 }

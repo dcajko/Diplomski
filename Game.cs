@@ -8,6 +8,7 @@ public partial class Game : Node3D
 {
     private int movesToExecute;
     private Timer MoveExecutionTimer;
+    private bool TimedOut;
 
     [Signal]
     public delegate void TurnChangeEventHandler(int player);
@@ -19,11 +20,12 @@ public partial class Game : Node3D
     [Export]
     public int NumberOfPlayers { get; set; } = 2;
     [Export]
-    public double TurnExectutionDuration { get; set; } = 2;
+    public double TurnExectutionDuration { get; set; } = 1.5;
 
-    public int PlayerTurn { get; set; } = 1;
+    public int PlayerTurn { get; set; } = 0;
     public int PlayerGold { get; set; } = 0;
     public List<Move> Moves { get; set; } = new List<Move>();
+    public int TurnCounter { get; private set; } = 0;
 
     private View ViewNode { get; set; }
 
@@ -41,9 +43,11 @@ public partial class Game : Node3D
     {
         ViewNode = GetNode<View>("CameraRoot/Camera");
         MoveExecutionTimer = new Timer();
+        MoveExecutionTimer.OneShot = true;
+        MoveExecutionTimer.ProcessCallback = Timer.TimerProcessCallback.Physics;
         MoveExecutionTimer.Timeout += TurnTimeout;
         Helper.AddNode(this, MoveExecutionTimer);
-        this.SetupTurn();
+        this.NextTurn();
     }
 
     public void NextTurn()
@@ -51,6 +55,8 @@ public partial class Game : Node3D
         PlayerTurn++;
         if (PlayerTurn > NumberOfPlayers)
         {
+            TurnCounter++;
+            this.TimedOut = false;
             PlayerTurn = 0;
             PlayMoves();
         }
@@ -67,10 +73,7 @@ public partial class Game : Node3D
     {
         EmitSignal(SignalName.ExecutionStarted, PlayerTurn);
         movesToExecute = Moves.Count;
-        if (movesToExecute > 0)
-        {
-            this.MoveExecutionTimer.Start(TurnExectutionDuration);
-        }
+        this.MoveExecutionTimer.Start(TurnExectutionDuration);
         foreach (var move in Moves)
         {
             move.FormationBox.AllPawnsAtLocation += MoveDone;
@@ -80,27 +83,28 @@ public partial class Game : Node3D
 
     public void MoveDone()
     {
-        movesToExecute--;
-        if (movesToExecute <= 0)
+        if (!TimedOut)
         {
-            ExecutionFinished();
+            movesToExecute--;
+            if (movesToExecute <= 0)
+            {
+                //ExecutionFinished();
+            }
         }
     }
 
     public void TurnTimeout()
     {
         GD.Print("TurnTimeout");
-        foreach (var move in Moves)
-        {
-            move.FormationBox.StopUnits();
-        }
+        this.TimedOut = true;
+        GetTree().GetNodesInGroup("Selectable").Cast<Pawn>().ToList().ForEach(x => x.ExitCombat());
         ExecutionFinished();
     }
 
     public void ExecutionFinished()
     {
         GD.Print("AllMovesFinished");
-        this.MoveExecutionTimer.Stop();
+        //this.MoveExecutionTimer.Stop();
         foreach (var item in Moves)
         {
             item.Dispose();
@@ -108,6 +112,17 @@ public partial class Game : Node3D
         Moves.Clear();
         GetTree().GetNodesInGroup("Selectable").Cast<Pawn>().Where(x => x.Player == -1).ToList().ForEach(x => x.QueueFree());
         EmitSignal(SignalName.ExecutionEnded, PlayerTurn);
-        NextTurn();
+        this.NextTurn();
+    }
+
+    public GameEnvironment GetGameEnvironment(int Player)
+    {
+        GameEnvironment env = new GameEnvironment();
+        env.OwnUnits = GetTree().GetNodesInGroup("Selectable").Cast<Pawn>().Where(x => x.Player == Player).ToList();
+        env.EnemyUnits = GetTree().GetNodesInGroup("Selectable").Cast<Pawn>().Where(x => x.Player != Player).ToList();
+        env.HomeBases = GetTree().GetNodesInGroup("Spawner").Cast<Spawner>().Where(x => x.Player == Player).ToList();
+        env.EnemyBases = GetTree().GetNodesInGroup("Spawner").Cast<Spawner>().Where(x => x.Player != Player).ToList();
+        env.TurnCounter = this.TurnCounter;
+        return env;
     }
 }

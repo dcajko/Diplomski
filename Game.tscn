@@ -1,10 +1,11 @@
-[gd_scene load_steps=8 format=3 uid="uid://537pe4ucyavy"]
+[gd_scene load_steps=9 format=3 uid="uid://537pe4ucyavy"]
 
 [ext_resource type="Script" path="res://View.cs" id="1_hu5de"]
 [ext_resource type="Script" path="res://Game.cs" id="1_ilatl"]
 [ext_resource type="Script" path="res://CameraRoot.cs" id="1_qyw8m"]
 [ext_resource type="Script" path="res://SelectionDummy.cs" id="2_cgscj"]
 [ext_resource type="PackedScene" uid="uid://kxhf5c55dlrb" path="res://Interface.tscn" id="4_cfdp0"]
+[ext_resource type="Script" path="res://EnemyAi.cs" id="6_i3gmv"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gd35q"]
 albedo_color = Color(1, 0.501961, 1, 0.501961)
@@ -25,7 +26,7 @@ MoveSpeed = 0.5
 transform = Transform3D(1, 0, 0, 0, 0.0174524, 0.999848, 0, -0.999848, 0.0174524, 0, 200, 0)
 projection = 1
 current = true
-size = 70.0
+size = 50.0
 script = ExtResource("1_hu5de")
 Game = NodePath("../..")
 
@@ -36,6 +37,9 @@ Game = NodePath("../../..")
 mesh = SubResource("PlaneMesh_kt553")
 skeleton = NodePath("../..")
 script = ExtResource("2_cgscj")
+
+[node name="EnemyAi" type="Node" parent="."]
+script = ExtResource("6_i3gmv")
 
 [connection signal="MouseDragEnd" from="CameraRoot/Camera" to="SelectionDummy" method="OnSelectionEnd"]
 [connection signal="MouseDragResize" from="CameraRoot/Camera" to="SelectionDummy" method="OnSelectionChange"]

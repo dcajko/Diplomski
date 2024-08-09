@@ -231,9 +231,9 @@ public partial class View : Camera3D
     public void NewOrder(Vector3 moveToLocation)
     {
         var SelectedPawns = SelectablePawns.Where(x => x.Selected);
-        Vector3 AverageSelectionLocation = SelectedPawns.Aggregate(Vector3.Zero, (acc, obj) => acc + obj.GlobalPosition);
         var count = SelectedPawns.Count();
-        var directionTo = moveToLocation.DirectionTo(AverageSelectionLocation/count);
+        Vector3 AverageSelectionLocation = SelectedPawns.Aggregate(Vector3.Zero, (acc, obj) => acc + obj.GlobalPosition) / count;
+        var directionTo = moveToLocation.DirectionTo(AverageSelectionLocation);
         var newOrientation = (float)Math.Atan2(directionTo.X, directionTo.Z);
         CreateNewOrder(moveToLocation, newOrientation);
     }

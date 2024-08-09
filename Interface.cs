@@ -12,11 +12,16 @@ public partial class Interface : Control
 
     public override void _Ready()
     {
-        
+        Game.TurnChange += UpdateTurnIndicator;
     }
 
     public void HideGameControls()
     {
 
+    }
+
+    public void UpdateTurnIndicator(int player)
+    {
+        GetNode<Label>("HBoxContainer/PlayerTurnNumber").Text = player.ToString();
     }
 }
