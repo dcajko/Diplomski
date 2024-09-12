@@ -70,7 +70,6 @@ public partial class SelectionDummy : MeshInstance3D
                 p.Selected = true;
             }
         }
-
     }
 
     public void Update()

@@ -4,6 +4,5 @@
 
 [node name="FormationBox" type="Node3D"]
 script = ExtResource("1_7amsh")
-Size = Vector2(4, 4)
 MinSize = 2.0
 NumberOfSelected = 16

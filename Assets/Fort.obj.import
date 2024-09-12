@@ -1,0 +1,22 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://drrvsfxclioux"
+path="res://.godot/imported/Fort.obj-1234d4b9e044eaba61b2ea3299a404a1.mesh"
+
+[deps]
+
+files=["res://.godot/imported/Fort.obj-1234d4b9e044eaba61b2ea3299a404a1.mesh"]
+
+source_file="res://Assets/Fort.obj"
+dest_files=["res://.godot/imported/Fort.obj-1234d4b9e044eaba61b2ea3299a404a1.mesh", "res://.godot/imported/Fort.obj-1234d4b9e044eaba61b2ea3299a404a1.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true
+force_disable_mesh_compression=false

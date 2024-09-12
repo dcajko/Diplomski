@@ -35,13 +35,9 @@ public partial class EnemyAi : Node
         QueryEnvironment();
         SpawnUnits();
         AttackPlayer();
-        DefendBase();
         Game.NextTurn();
     }
 
-    private void DefendBase()
-    {
-    }
 
     private void AttackPlayer()
     {

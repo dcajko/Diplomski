@@ -6,8 +6,6 @@ using System.Threading.Tasks;
 public partial class Floor : StaticBody3D
 {
     private bool temp = true;
-    Random random = new Random();
-    // FastNoiseLite noise = new();
 
     [Export]
     public Texture2D TreeTexture { get; set; }
@@ -19,21 +17,8 @@ public partial class Floor : StaticBody3D
     [Export]
     public bool GenerateMesh { get => temp; set => GenerateTerrain(); }
 
-
-    // Called when the node enters the scene tree for the first time.
-    public override void _Ready()
-    {
-        Console.WriteLine();
-    }
-
-    // Called every frame. 'delta' is the elapsed time since the previous frame.
-    public override void _Process(double delta)
-    {
-    }
-
     public void GenerateTerrain()
     {
-        // noise.Offset = new Vector3((float)random.NextDouble(), (float)random.NextDouble(), (float)random.NextDouble()) * 1000;
         GD.Print("Generating terrain");
         var plane = new PlaneMesh();
         plane.Size = new Vector2(MeshSize, MeshSize);

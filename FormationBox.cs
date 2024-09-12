@@ -124,9 +124,7 @@ public partial class FormationBox : Node3D
         }
         if (r != 0)
         {
-            //// GD.Print($"Offset vars: x:{x}, r:{r}, minSize:{MinSize}");
-            float offset = ((x-1) - (r - 1f))/2f;
-            //// GD.Print($"offset: {offset}");   
+            float offset = ((x-1) - (r - 1f))/2f; 
             for (int i = 0; i< r; i++)
             {
                 CreatePoint((i + offset)*MinSize, y * MinSize);
