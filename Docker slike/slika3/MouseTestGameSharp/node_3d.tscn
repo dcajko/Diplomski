@@ -1,0 +1,80 @@
+[gd_scene load_steps=11 format=3 uid="uid://fxwc1ccn81hv"]
+
+[ext_resource type="Script" path="res://FreeLookCameraBase.cs" id="1_ox7b1"]
+[ext_resource type="PackedScene" uid="uid://cggqb75a8w8r" path="res://addons/debug_menu/debug_menu.tscn" id="2_5mgxh"]
+
+[sub_resource type="Environment" id="Environment_snpmn"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_b150x"]
+size = Vector2(100, 200)
+
+[sub_resource type="BoxMesh" id="BoxMesh_lidbh"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_iifcw"]
+albedo_color = Color(0.215686, 0.239216, 0.796078, 1)
+metallic = 0.4
+roughness = 0.4
+
+[sub_resource type="TorusMesh" id="TorusMesh_1ttxu"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hwfl3"]
+albedo_color = Color(0.000113828, 0.000113828, 0.000113828, 1)
+metallic = 0.25
+roughness = 0.37
+emission_enabled = true
+emission = Color(1, 0.262745, 0, 1)
+
+[sub_resource type="TorusMesh" id="TorusMesh_i7syk"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mu7lo"]
+albedo_color = Color(0.258824, 1, 1, 1)
+metallic = 0.65
+roughness = 0.13
+
+[node name="Node3D" type="Node3D"]
+
+[node name="FreeLookCamera" type="Camera3D" parent="."]
+transform = Transform3D(0.764415, -0.253445, 0.59282, 0, 0.919493, 0.393105, -0.644725, -0.300496, 0.702875, 1.61486, 2.29154, 2.12757)
+script = ExtResource("1_ox7b1")
+
+[node name="CanvasLayer" parent="FreeLookCamera" instance=ExtResource("2_5mgxh")]
+
+[node name="Debug" type="RichTextLabel" parent="FreeLookCamera"]
+offset_right = 1150.0
+offset_bottom = 647.0
+
+[node name="World" type="Node3D" parent="."]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="World"]
+environment = SubResource("Environment_snpmn")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="World"]
+transform = Transform3D(0.965926, 2.57067e-08, -0.258819, 0.207555, 0.597415, 0.774607, 0.154622, -0.801932, 0.577059, 0, 4, 1.49056)
+shadow_enabled = true
+
+[node name="Geometry" type="Node3D" parent="World"]
+
+[node name="Floor" type="MeshInstance3D" parent="World/Geometry"]
+mesh = SubResource("PlaneMesh_b150x")
+skeleton = NodePath("../../..")
+
+[node name="Cube" type="MeshInstance3D" parent="World/Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -0.627267)
+mesh = SubResource("BoxMesh_lidbh")
+skeleton = NodePath("")
+
+[node name="Cube2" type="MeshInstance3D" parent="World/Geometry"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.378609, 0.5, 0)
+mesh = SubResource("BoxMesh_lidbh")
+skeleton = NodePath("")
+surface_material_override/0 = SubResource("StandardMaterial3D_iifcw")
+
+[node name="Torus" type="MeshInstance3D" parent="World/Geometry"]
+transform = Transform3D(0.734168, -0.678967, 0, 0.678967, 0.734168, 0, 0, 0, 1, -1.47308, 1.27469, -0.00109053)
+mesh = SubResource("TorusMesh_1ttxu")
+surface_material_override/0 = SubResource("StandardMaterial3D_hwfl3")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="World/Geometry"]
+transform = Transform3D(0.69804, 0.716058, 0, -0.716058, 0.69804, 0, 0, 0, 1, -1.51878, 1.124, 0.750625)
+mesh = SubResource("TorusMesh_i7syk")
+surface_material_override/0 = SubResource("StandardMaterial3D_mu7lo")

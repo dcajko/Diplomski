@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=3 uid="uid://fxwc1ccn81hv"]
+
+[ext_resource type="Script" path="res://camera.gd" id="1_ox7b1"]
+
+[sub_resource type="Environment" id="Environment_snpmn"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_lidbh"]
+
+[node name="Node3D" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_snpmn")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_lidbh")
+skeleton = NodePath("")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.965926, 1.13133e-08, -0.258819, 0.25, 0.258819, 0.933013, 0.0669873, -0.965926, 0.25, 0, 4, 0)
+
+[node name="FreeLookCamera" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.78705)
+script = ExtResource("1_ox7b1")
